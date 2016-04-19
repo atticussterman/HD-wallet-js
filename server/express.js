@@ -14,6 +14,8 @@ var helmet = require('helmet')
 var parseUrl = require('url').parse;
 var https = require('https');
 
+var MOUNT_POINT = process.env.MOUNT_POINT || "";
+
 module.exports = function (){
     var app = express()
 
@@ -63,7 +65,7 @@ module.exports = function (){
     var cacheControl = isProduction() ? { maxAge: anHour } : null
     app.use(express.static(path.join(__dirname, '..', 'build'), cacheControl))
 
-    app.get('/proxy', function (req, res) {
+    app.get(MOUNT_POINT + '/proxy', function (req, res) {
         var rqst = https.get(req.query.url, function(resp) {
             resp.pipe(res);
         });
@@ -73,7 +75,7 @@ module.exports = function (){
         });
     });
 
-    app.post('/proxy', function (req, res) {
+    app.post(MOUNT_POINT + '/proxy', function (req, res) {
         var url = parseUrl(req.query.url);
         url.method = 'POST';
         var rqst = https.request(url, function(resp) {
@@ -87,7 +89,7 @@ module.exports = function (){
         rqst.end();
     });
 
-    app.post('/register', validateAuthParams(false), function(req, res) {
+    app.post(MOUNT_POINT + '/register', validateAuthParams(false), function(req, res) {
         var name = req.body.wallet_id
         auth.register(name, req.body.pin, function(err, token){
             if(err) {
@@ -102,7 +104,7 @@ module.exports = function (){
         })
     })
 
-    app.post('/login', validateAuthParams(true), function(req, res) {
+    app.post(MOUNT_POINT + '/login', validateAuthParams(true), function(req, res) {
         var name = req.body.wallet_id
         auth.login(name, req.body.pin, function(err, token){
             if(err) {
@@ -117,7 +119,7 @@ module.exports = function (){
         })
     })
 
-    app.get('/exist', function(req, res){
+    app.get(MOUNT_POINT + '/exist', function(req, res){
         var name = req.query.wallet_id
         if (!name) return res.status(400).json({error: 'Bad request'});
 
@@ -131,7 +133,7 @@ module.exports = function (){
         })
     })
 
-    app.delete('/pin', restrict, function(req, res) {
+    app.delete(MOUNT_POINT + '/pin', restrict, function(req, res) {
         var id = req.body.id
         var pin = req.body.pin
 
@@ -141,7 +143,7 @@ module.exports = function (){
         })
     })
 
-    app.get('/reset', function(req, res){
+    app.get(MOUNT_POINT + '/reset', function(req, res){
         var name = req.query.wallet_id
         if (!name) return res.status(400).json({error: 'Bad request'});
 
@@ -150,7 +152,7 @@ module.exports = function (){
         })
     })
 
-    app.post('/location', function(req, res) {
+    app.post(MOUNT_POINT + '/location', function(req, res) {
         var args = prepareGeoData(req, res)
 
         args.push(function(err) {
@@ -161,7 +163,7 @@ module.exports = function (){
         geo.save.apply(null, args)
     })
 
-    app.put('/location', function(req, res) {
+    app.put(MOUNT_POINT + '/location', function(req, res) {
         var args = prepareGeoData(req, res)
         args.push(function(err, results) {
             if(err) return res.status(400).json(err)
@@ -189,7 +191,7 @@ module.exports = function (){
         return [lat, lon, data]
     }
 
-    app.delete('/location', function(req, res) {
+    app.delete(MOUNT_POINT + '/location', function(req, res) {
         geo.remove(req.session.tmpSessionID)
         res.status(200).send()
     })
