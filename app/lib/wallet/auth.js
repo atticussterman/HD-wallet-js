@@ -1,7 +1,7 @@
 'use strict';
 
 var xhr = require('hive-xhr')
-var uriRoot = window.location.origin
+var uriRoot = window.location.origin + window.location.pathname.replace(/\/$/, '');
 
 function register(wallet_id, pin, callback) {
   postCredentials('register', wallet_id, pin, callback)
