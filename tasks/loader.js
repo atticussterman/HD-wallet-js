@@ -1,5 +1,6 @@
 var async = require('async')
 var bundle = require('./util').bundle
+var buildDir = require('./util').buildDir
 
 process.env.LANGUAGE = process.env.LANGUAGE || 'en'
 
@@ -11,11 +12,11 @@ function loader(callback) {
 }
 
 function index(callback) {
-  bundle('./app/loader/index.js', './build/assets/js/loader.js', callback)
+    bundle('./app/loader/index.js', buildDir('/assets/js/loader.js'), callback)
 }
 
 function nope(callback) {
-  bundle('./app/loader/nope.js', './build/assets/js/nope-' + process.env.LANGUAGE + '.js', callback)
+    bundle('./app/loader/nope.js', buildDir('/assets/js/nope-') + process.env.LANGUAGE + '.js', callback)
 }
 
 module.exports = {
