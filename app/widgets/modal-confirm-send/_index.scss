@@ -13,8 +13,8 @@
     max-width: 450px;
 
     @include breakpoint(portrait) {
-        width: 450px;s
-                     padding-top: 30px;
+        width: 450px;
+        padding-top: 30px;
     }
 
     &._error {
