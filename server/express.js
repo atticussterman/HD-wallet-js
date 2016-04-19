@@ -17,8 +17,6 @@ var https = require('https');
 module.exports = function (){
     var app = express()
 
-    app.use(requireHTTPS)
-
     if(isProduction()){
         app.set('trust proxy', true)
         app.use(helmet.csp({
@@ -196,7 +194,8 @@ module.exports = function (){
         res.status(200).send()
     })
 
-    app.use(function(err, req, res){
+    app.use(function(err, req, res, next){
+        if (!err) return next();
         console.error(err.stack);
         res.status(500).send('Oops! something went wrong.');
     })
@@ -224,14 +223,6 @@ module.exports = function (){
     function setCookie(req, wallet_id, callback){
         req.session.wallet_id = wallet_id
         callback()
-    }
-
-    function requireHTTPS(req, res, next) {
-        var herokuForwardedFromHTTPS = req.headers['x-forwarded-proto'] === 'https'
-        if (!herokuForwardedFromHTTPS && isProduction()) {
-            return res.redirect('https://' + req.get('host') + req.url)
-        }
-        next()
     }
 
     function isProduction(){
